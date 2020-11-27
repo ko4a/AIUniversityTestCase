@@ -1,0 +1,8 @@
+flight:
+  not_exist: Flight not exist !
+  seat_is_not_free: Seat is not free !
+  sales_completed: Sales completed !
+  id_not_exist: Flight with id %d not exist
+
+event:
+    not_registered: Event is not registered in system

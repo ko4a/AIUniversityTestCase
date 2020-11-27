@@ -1,0 +1,88 @@
+version: '3.3'
+
+services:
+
+  db:
+    container_name: db
+    image: postgres:12
+    restart: always
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-userpass}
+      POSTGRES_DB: ${POSTGRES_DB:-ai}
+    networks:
+      - app
+
+  php:
+    container_name: php
+    build: docker/php
+    ports:
+      - 9001:9000
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-userpass}
+      POSTGRES_DB: ${POSTGRES_DB:-ai}
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-SWQOKODSQALRPCLNMEQG}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-rabbitmq}
+    volumes:
+      - ./:/var/www/symfony:cached
+      - /etc/timezone:/etc/timezone:cached
+    networks:
+      - app
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.16.0-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www/symfony:cached
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:cached
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - app
+    depends_on:
+      - php
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - app
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-SWQOKODSQALRPCLNMEQG}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-rabbitmq}
+    ports:
+    - 15672:15672
+    - 5672:5672
+    volumes:
+      - ./docker/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+    networks:
+      - app
+
+
+volumes:
+  public:
+  postgresql:
+
+networks:
+  app:
+
+configs:
+  nginx_config:
+    file: ./docker/nginx/default.conf

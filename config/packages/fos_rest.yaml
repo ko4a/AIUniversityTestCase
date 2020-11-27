@@ -1,0 +1,21 @@
+fos_rest:
+    routing_loader: false
+    body_listener: true
+    format_listener:
+        rules:
+            - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [json] }
+    body_converter:
+        enabled: true
+        validate: true
+        validation_errors_argument: validationErrors
+    zone:
+        - { path: ^/api/* }
+    exception:
+        enabled: true
+    param_fetcher_listener: true
+    view:
+        view_response_listener: 'force'
+        formats:
+            json: true
+    serializer:
+        serialize_null: true
