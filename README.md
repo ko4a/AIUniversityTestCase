@@ -1,6 +1,6 @@
-##REQUIREMENTS
+<h2>REQUIREMENTS</h1>
 docker <br />
 docker-compose <br />
 
-##How to run project
+<h2>How to run project</h2>
 make install
