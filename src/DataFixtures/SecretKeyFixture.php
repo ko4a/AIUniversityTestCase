@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\CallbackSecretKey;
@@ -12,7 +14,7 @@ class SecretKeyFixture extends Fixture
     {
         for ($i = 0; $i < 10; ++$i) {
             $key = new CallbackSecretKey();
-            $key->setKey(str_repeat($i, $i));
+            $key->setKey(str_repeat((string) $i, $i));
             $manager->persist($key);
         }
         $manager->flush();

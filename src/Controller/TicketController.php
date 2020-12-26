@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\DTO\TicketCreateRequestDTO;
 use App\Entity\Ticket;
 use App\Service\TicketService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -38,11 +39,11 @@ class TicketController extends AbstractFOSRestController
      * )
      * )
      * @Rest\RequestParam(name="seat", requirements=@Assert\Range(min=1, max=150), nullable=false, description="seat number which you want to buy")
-     * @Rest\RequestParam(name="flight_id",nullable=false, description="flight where you want to buy seat")
+     * @Rest\RequestParam(name="flight_id", nullable=false, description="flight where you want to buy seat")
      */
     public function post(ParamFetcherInterface $paramFetcher): View
     {
-        $ticket = $this->ticketService->create($paramFetcher->all());
+        $ticket = $this->ticketService->create(new TicketCreateRequestDTO($paramFetcher->all()));
 
         return $this->view($ticket, Response::HTTP_CREATED);
     }

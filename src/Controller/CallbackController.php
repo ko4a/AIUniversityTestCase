@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\DTO\CallbackRequestDTO;
 use App\Security\Voter\CallbackVoter;
 use App\Service\CallbackService;
+use App\Validator\CallbackRequestConstraint;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -60,15 +62,15 @@ class CallbackController extends AbstractFOSRestController
      *    )
      *  )
      *)
-     * @Rest\RequestParam(name="data")
+     * @Rest\RequestParam(name="data", requirements=@CallbackRequestConstraint)
      */
     public function call(ParamFetcherInterface $paramFetcher): View
     {
-        $data = $paramFetcher->all();
+        $dto = new CallbackRequestDTO($paramFetcher->all());
 
-        $this->denyAccessUnlessGranted(CallbackVoter::CALLBACK, $data['data']['secret_key']);
+        $this->denyAccessUnlessGranted(CallbackVoter::CALLBACK, $dto->getSecretKey());
 
-        $this->callbackService->call($data);
+        $this->callbackService->call($dto);
 
         return $this->view([], JsonResponse::HTTP_OK);
     }

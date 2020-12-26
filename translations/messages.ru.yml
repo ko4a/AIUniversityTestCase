@@ -3,6 +3,14 @@ flight:
   seat_is_not_free: Seat is not free !
   sales_completed: Sales completed !
   id_not_exist: Flight with id %d not exist
+  id_required: Flight id is required.
+
+id:
+  not_int: id should be integer
 
 event:
     not_registered: Event is not registered in system
+
+callback:
+  data_invalid: data should contain array
+  field_required: field %s is required

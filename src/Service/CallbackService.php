@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\DTO\CallbackRequestDTO;
 use App\Message\FlightCanceledMessage;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -30,17 +31,15 @@ class CallbackService
         $this->bus = $bus;
     }
 
-    public function call(array $data): void
+    public function call(CallbackRequestDTO $dto): void
     {
-        $event = $data['data']['event'];
-
-        if (!in_array($event, self::EVENTS, true)) {
+        if (!in_array($dto->getEvent(), self::EVENTS, true)) {
             throw new BadRequestHttpException($this->translator->trans('event.not_registered'), null, Response::HTTP_BAD_REQUEST);
         }
 
-        $flightId = $data['data']['flight_id'];
+        $flightId = $dto->getFlightId();
 
-        if (self::FLIGHT_SALES_COMPLETED === $event) {
+        if (self::FLIGHT_SALES_COMPLETED === $dto->getEvent()) {
             $this->flightService->completeSaling($flightId);
         } else {
             $this->bus->dispatch(new FlightCanceledMessage($flightId));

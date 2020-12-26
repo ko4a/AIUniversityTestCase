@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\DTO\ReservationCreateRequestDTO;
 use App\Entity\Reservation;
 use App\Service\ReservationService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -38,11 +39,11 @@ class ReservationController extends AbstractFOSRestController
      * )
      * )
      * @Rest\RequestParam(name="seat", requirements=@Assert\Range(min=1, max=150), nullable=false, description="seat number which you want to book")
-     * @Rest\RequestParam(name="flight_id",nullable=false, description="flight where you want to book seat")
+     * @Rest\RequestParam(name="flight_id", nullable=false, description="flight where you want to book seat")
      */
     public function post(ParamFetcherInterface $paramFetcher): View
     {
-        $reservation = $this->reservationService->create($paramFetcher->all());
+        $reservation = $this->reservationService->create(new ReservationCreateRequestDTO($paramFetcher->all()));
 
         return $this->view($reservation, Response::HTTP_CREATED);
     }
